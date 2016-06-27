@@ -12,7 +12,7 @@ using namespace std;
 class Instance {
 
 private:
-	int numNodes; //Número de nós = deposito (id = 0) + clientes (n) = n + n+1.
+	int numNodes; //Número de nós = deposito (id = 0) + clientes (n) = 26
     int numVehicles; //Número de veículos.
     int capacitated; //Capacidade dos veículos.
 	vector< vector<double> > cost; //Custo de viagem do nodo i a j. Matriz = (numNodes+1 x numNodes+1), acrescenta depósito virtual. 

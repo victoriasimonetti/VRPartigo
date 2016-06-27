@@ -47,7 +47,6 @@ void Solution::setTotalCost(double t){
 //atualizar tempo de atendimento do nodo, tempo total da rota e infactibilidades (cap. e janela)
 void Solution::calculateTimeServiceAndFaults(int i, int j, int v){
 	
-	cout  << this->instancia->getCost(i,j) << endl;
     this->getRoute(v)->setTotalCostRoute( this->getRoute(v)->getTotalCostRoute() + this->instancia->getCost(i,j));
 
 	//tempo que o nodo j começa a ser atendido.
@@ -78,18 +77,12 @@ void Solution::calculateTimeServiceAndFaults(int i, int j, int v){
 //Recalcula a solução a partir E apenas da rota que foi modificada.
 void Solution::recalculateSolutionOnlyRoute(int v){
 
-	//this->totalCost = 0.0;
-	//cout << "custo da solucao antes de remover rota: " << this->getTotalCost() << endl;
+
 	this->setTotalCost( this->getTotalCost() - (this->getRoute(v)->getTotalCostRoute() + 1000*this->getRoute(v)->getLateCost() + 1000*this->getRoute(v)->getOverCapacitated()));
-		//cout <<  1000*this->getRoute(v)->getLateCost() << " " << 1000*this->getRoute(v)->getOverCapacitated();
-		//cout << "custo da solucao depois de remover rota: " << this->getTotalCost() << endl;
 	this->delayedArrivalCost -= this->getRoute(v)->getLateCost();
 	this->overCapacitated -= this->getRoute(v)->getOverCapacitated();
-	this->calculaRotaSolution(v);
-	this->setTotalCost(this->getTotalCost() + this->getRoute(v)->getTotalCostRoute());
-	this->setTotalCost(this->getTotalCost() + 1000 * this->getDelayedArrivalCost() + 1000 * this->getOverCapacitated());
-   // this->setTotalCost(this->getTotalCost() + this->getRoute(v)->getTotalCostRoute() + 1000*this->getRoute(v)->getLateCost() - 1000*this->getRoute(v)->getOverCapacitated());
-	cout << this->getTotalCost() << endl;
+	this->calculaRotaSolution(v);	
+    this->setTotalCost(this->getTotalCost() + this->getRoute(v)->getTotalCostRoute() + 1000*this->getRoute(v)->getLateCost() + 1000*this->getRoute(v)->getOverCapacitated());
 	
 }
 
@@ -120,7 +113,6 @@ void Solution::forcaBrutaRecalculaSolution(){
     for(int v=0; v<this->instancia->getNumVehicles(); v++){
     	this->calculaRotaSolution(v);
 		this->setTotalCost(this->getTotalCost() + this->getRoute(v)->getTotalCostRoute());
-		cout <<  this->getRoute(v)->getTotalCostRoute() << endl;
     } 
     
     this->setTotalCost(this->getTotalCost() + 1000 * this->getDelayedArrivalCost() + 1000 * this->getOverCapacitated());
@@ -129,6 +121,7 @@ void Solution::forcaBrutaRecalculaSolution(){
 void Solution::printSolution(){
 
 	for(int r=0; r<this->instancia->getNumVehicles(); r++){
+	    cout << "Rota número: " << r << endl;
 		cout << "Total Time da rota: " << this->routes[r].getTotalTime() << endl;
 		cout << "Atrasos da rota: " << this->routes[r].getLateCost() << endl;
 		cout << "excesso de capacidade da rota: " << this->routes[r].getOverCapacitated() << endl;
@@ -150,6 +143,9 @@ void Solution::printSolution(){
 	cout << endl << "*******************************************************" << endl << endl;
 
 }
+
+
+
 
 
 

@@ -80,10 +80,7 @@ Solution simulatedAnnealing(double alfa, Solution s, double t0, int maxIterTemp)
 		while(iterTemp < maxIterTemp){
 			iterTemp += 1;
 			standartSolution = s;
-			currentSolution  = nb->interRoutes(s); //gera vizinho inter-rota aleatoriamente					
-			
-			//currentSolution.forcaBrutaRecalculaSolution(); //calculando por enquanto na força bruta.
-			//s.forcaBrutaRecalculaSolution(); //calculando por enquanto na força bruta.	        
+			currentSolution  = nb->interRoutes(s); //gera vizinho inter-rota aleatoriamente					     
 			
 			
 			delta = currentSolution.getTotalCost() - standartSolution.getTotalCost();
@@ -163,7 +160,7 @@ int main(int argc, char** argv){
     s.forcaBrutaRecalculaSolution();
 	cout << endl << "----------------- SOLUCAO FINAL ---------------------------" << endl << endl;
 
-	s.printSolution();
+	//s.printSolution();
 
 	return 0;
 }

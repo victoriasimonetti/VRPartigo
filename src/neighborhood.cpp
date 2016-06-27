@@ -4,16 +4,9 @@ Neighborhood::Neighborhood(Instance* i){
     this->instancia = i;
 }
 
-int Neighborhood::rotaComCliente(Solution s, int route){
-	for(int i=1; i<this->instancia->getNumNodes(); i++){
-		if(s.getRoute(route)->getForward(i) != -1){
-			return 1; //pelo menos um cliente está nessa rota.
-		}
-	}
-	return 0;
-}
 
-Solution Neighborhood::updateRota1(Solution s, int nodoSelected, int rota1){
+//Retira nodo e religa arestas.
+Solution Neighborhood::retiraNodo(Solution s, int nodoSelected, int rota1){
 
 	//apaga arestas adjacentes ao nodo da rota 1 e religa.
 	int forwardNodoSelected = s.getRoute(rota1)->getForward(nodoSelected); //3
@@ -25,7 +18,8 @@ Solution Neighborhood::updateRota1(Solution s, int nodoSelected, int rota1){
 	return s;
 }
 
-Solution Neighborhood::updateRota2(Solution s, int arestaI, int rota2, int nodoSelected){
+//Adiciona nodo selecionado entre uma aresta.
+Solution Neighborhood::addNodo(Solution s, int arestaI, int rota2, int nodoSelected){
 
     //apaga arestas selecionadas da rota 2 e insere nodo selecionado entre elas.
 	int forwardNodoI = s.getRoute(rota2)->getForward(arestaI); //6
@@ -38,54 +32,97 @@ Solution Neighborhood::updateRota2(Solution s, int arestaI, int rota2, int nodoS
 
 Solution Neighborhood::interRoutes(Solution s){
 
-	//seleciona duas rotas aleatoriamente, rota 1 com pelo menos um cliente. ** rota 2 != rota 1.
-	int rota1 = rand() % this->instancia->getNumVehicles(); //0 a veiculos-1
-	while (rotaComCliente(s, rota1) == 0){
-		rota1 = rand() % this->instancia->getNumVehicles();	
-	}
+	int numRotas = this->instancia->getNumVehicles();
+	int numNodos = this->instancia->getNumNodes();
+	int aresta1, aresta2, aresta3, aresta4;
+	int aux = 0 ;
+	Solution solutionAux(this->instancia);
+	solutionAux = s;
+	Solution bestSolution(this->instancia);
+	bestSolution = s;
 
-	int rota2 = rand() % this->instancia->getNumVehicles();
-	while (rota2 == rota1){
-		rota2 = rand() % this->instancia->getNumVehicles();	
-	}
-	
-	//rota 1 : seleciona 1 nodo aleatoriamente, não pode ser depósito e tem q ser cliente da rota.
-	int nodoSelected = s.getRoute(rota1)->getForward(rand() % this->instancia->getNumNodes());
-	while (nodoSelected == -1 || nodoSelected == this->instancia->getNumNodes()){
-		nodoSelected = s.getRoute(rota1)->getForward(rand() % this->instancia->getNumNodes());
-	}
+	cout << "dentro da inter " << endl;
+	for(int rota1=0; rota1 < numRotas; rota1++){ //para cada rota
+		for(int rota2=rota1+1; rota2 < numRotas; rota2++){ //para cada rota
+			aresta1=0; aresta2=0; aresta3=0; aresta4=0;
+			aresta3 = s.getRoute(rota2)->getForward(aresta3); 																												aresta4 = s.getRoute(rota2)->getForward(aresta4);
+			cout << "dentro do for 1" << endl;
+			if(rota1 != rota2){
+				cout << "dentro do for 2" << endl;
+				while(aresta1 != numNodos){
+						cout << "dentro do while 1" << endl;
+						aresta2 = aresta1;
+					while(aresta2 != numNodos){	
+						cout << "dentro do while 2" << endl;					
+						while(aresta3 != numNodos){	
+						cout << "dentro do while 3" << endl;
+							aresta4 = aresta3;						
+							while(aresta4 != numNodos){ //observar para nodos do deposito, ainda n tenho certeza
+								cout << "dentro do while 4" << endl;
+								//retira trecho de rota da rota 1
+								aux = aresta1;
+								while(aux !=  s.getRoute(rota1)->getForward(aresta2)){
+									cout << "dentro do while 5" << endl;
+									solutionAux = retiraNodo(solutionAux, s.getRoute(rota1)->getForward(aux), rota1);
+									aux = s.getRoute(rota1)->getForward(aux);
+								}
 
-	// rota 2 seleciona uma aresta.
-	int arestaI = rand() % this->instancia->getNumNodes();
-	int arestaJ = s.getRoute(rota2)->getForward(arestaI);
+								//retira trecho de rota da rota 2
+								aux = aresta3;
+								while(aux !=  s.getRoute(rota2)->getForward(aresta4)){
+									cout << "dentro do while 6 rota" << endl;
+									solutionAux = retiraNodo(solutionAux, s.getRoute(rota2)->getForward(aux), rota2);
+									aux = s.getRoute(rota2)->getForward(aux);
+								}
+																solutionAux.printSolution();
+								//add novo trecho na rota 1
+								aux = aresta1;
+								int nodoSelected = s.getRoute(rota2)->getForward(aresta3);
+								while(aux != aresta4){
+									cout << "dentro do while 7" << endl;
+									solutionAux = addNodo(solutionAux, aux, rota1, nodoSelected);	
+									aux = nodoSelected;
+									nodoSelected = s.getRoute(rota2)->getForward(aux);
+								}
+								solutionAux.getRoute(rota1)->setForward(aresta4, s.getRoute(rota1)->getForward(aresta2));
 
-	while (arestaJ == -1){
-        arestaI = rand() % this->instancia->getNumNodes();
-	    arestaJ = s.getRoute(rota2)->getForward(arestaI);
-	}
 
-	s = updateRota1(s, nodoSelected, rota1);
-	s = updateRota2(s, arestaI, rota2, nodoSelected);
+								//add novo trecho na rota 2
+								aux = aresta3;
+								nodoSelected = s.getRoute(rota1)->getForward(aresta1);
+								while(aux != aresta2){
+									cout << "dentro do while 8" << endl;
+									solutionAux = addNodo(solutionAux, aux, rota2, nodoSelected);	
+									aux = nodoSelected;
+									nodoSelected = s.getRoute(rota1)->getForward(aux);
+								}
+								solutionAux.getRoute(rota2)->setForward(aresta2, s.getRoute(rota2)->getForward(aresta4));
 
-	cout << "porrota 1" << endl;
-	s.recalculateSolutionOnlyRoute(rota2);
-	cout << "porrota 2" << endl;
-	s.recalculateSolutionOnlyRoute(rota1);
-	s.printSolution();
-	double srota = s.getTotalCost();
+								solutionAux.calculaRotaSolution(rota1);
+								solutionAux.calculaRotaSolution(rota2);
 
-	cout << "porforcabruta" << endl;
-	s.forcaBrutaRecalculaSolution();
-	s.printSolution();
-	double sbruta = s.getTotalCost();
-	
-
-	if(srota != sbruta){
-		cout << "bruta " << sbruta << "  " << "srota  " << srota << endl;
-		exit(0);
-	}
-	
-    return s;
+								//Guarda melhor solução da vizinhança
+								if(solutionAux.getTotalCost() < bestSolution.getTotalCost()){
+									bestSolution = solutionAux;
+									cout << "sol vizinhança " << bestSolution.getTotalCost() << endl;
+								}
+								solutionAux.printSolution();
+								exit(0);
+								//restaura
+								solutionAux = s;	
+								aresta1 = s.getRoute(rota1)->getForward(aresta1); 	
+								aresta2 = s.getRoute(rota1)->getForward(aresta2); 	
+								aresta3 = s.getRoute(rota2)->getForward(aresta3); 																												aresta4 = s.getRoute(rota2)->getForward(aresta4); 								
+																				
+							}
+						}						
+					}				
+				}						
+			}
+		}
+	}	
+	exit(0);
+    return bestSolution;
 }
 
 
