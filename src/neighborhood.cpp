@@ -52,38 +52,40 @@ Solution Neighborhood::interRoutes(Solution s){
 				for(aresta2=aresta1; aresta2<caminhoRota1.size()-1; aresta2++){
 					for(aresta3=0; aresta3<caminhoRota2.size()-1; aresta3++){
 						for(aresta4=aresta3; aresta4<caminhoRota2.size()-1; aresta4++){
-							//retira nodos
-							for(i=aresta1+1; i<=aresta2; i++){
-								auxSolution = retiraNodo(auxSolution, caminhoRota1[i], rota1);
-							}
-							for(i=aresta3+1; i<=aresta4; i++){
-								auxSolution = retiraNodo(auxSolution, caminhoRota2[i], rota2);
-							}
-							//add nodo na rota 2.
-							auxAresta = caminhoRota2[aresta3];
-							for(i=aresta1+1; i<=aresta2; i++){
-								auxSolution = addNodo(auxSolution, auxAresta, rota2, caminhoRota1[i]);
-								auxAresta = caminhoRota1[i];
-							}
-							//add nodo na rota 1.
-							auxAresta = caminhoRota1[aresta1];
-							for(i=aresta3+1; i<=aresta4; i++){
-								auxSolution = addNodo(auxSolution, auxAresta, rota1, caminhoRota2[i]);
-								auxAresta = caminhoRota2[i];
-							}
 
-							//recalcula
-							auxSolution.recalculateSolutionOnlyRoute(rota1);
-							auxSolution.recalculateSolutionOnlyRoute(rota2);
+							if(aresta2 - aresta1 <= 7 && aresta4 - aresta3 <= 7){
+								for(i=aresta1+1; i<=aresta2; i++){
+									auxSolution = retiraNodo(auxSolution, caminhoRota1[i], rota1);
+								}
+								for(i=aresta3+1; i<=aresta4; i++){
+									auxSolution = retiraNodo(auxSolution, caminhoRota2[i], rota2);
+								}
+								//add nodo na rota 2.
+								auxAresta = caminhoRota2[aresta3];
+								for(i=aresta1+1; i<=aresta2; i++){
+									auxSolution = addNodo(auxSolution, auxAresta, rota2, caminhoRota1[i]);
+									auxAresta = caminhoRota1[i];
+								}
+								//add nodo na rota 1.
+								auxAresta = caminhoRota1[aresta1];
+								for(i=aresta3+1; i<=aresta4; i++){
+									auxSolution = addNodo(auxSolution, auxAresta, rota1, caminhoRota2[i]);
+									auxAresta = caminhoRota2[i];
+								}
+
+								//recalcula
+								auxSolution.recalculateSolutionOnlyRoute(rota1);
+								auxSolution.recalculateSolutionOnlyRoute(rota2);
 							
-							//verifica se eh a melhor
-							if(auxSolution.getTotalCost() < bestSolution.getTotalCost()){
-								bestSolution = auxSolution;						
-							    //cout << "custo: " << bestSolution.getTotalCost()<< " - a1: " << aresta1 << " a2: " << aresta2  << " a3: " << aresta3 << " a4: " << aresta4 << endl;
-							}
+								//verifica se eh a melhor
+								if(auxSolution.getTotalCost() < bestSolution.getTotalCost()){
+									bestSolution = auxSolution;						
+									//cout << "custo: " << bestSolution.getTotalCost()<< " - a1: " << aresta1 << " a2: " << aresta2  << " a3: " << aresta3 << " a4: " << aresta4 << endl;
+								}
 							
-							//restaura
-							auxSolution = s;							
+								//restaura
+								auxSolution = s;	
+							}					
 						}
 					}
 				}	
