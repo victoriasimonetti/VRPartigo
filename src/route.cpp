@@ -67,6 +67,26 @@ void Route::setTotalTime(double time){
 	this->totalTime = time;
 }
 
+vector<int> Route::getCaminho(){
+    vector<int> caminho;
+    int nodo = 0;
+    while(nodo != -1){
+        caminho.push_back(nodo);
+        nodo = this->getForward(nodo);
+    }
+    return caminho;
+}
+
+void Route::printCaminho(){
+    vector<int> rota;
+    rota = this->getCaminho();
+    
+    for(int i=0; i<rota.size(); i++){
+        cout << " " << rota[i] << " ";
+    }
+    cout << endl;
+}
+
 
 
 

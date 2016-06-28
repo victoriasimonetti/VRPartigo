@@ -32,6 +32,8 @@ public:
 	void setTotalTime(double time);	
 	double getTotalCostRoute();
 	void setTotalCostRoute(double time);
+	vector<int> getCaminho();
+	void printCaminho();
 };
 
 

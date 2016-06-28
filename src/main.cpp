@@ -146,7 +146,8 @@ int main(int argc, char** argv){
 
     time_t seconds;
 	time(&seconds);
-    srand((unsigned int) seconds);
+    //srand((unsigned int) seconds);
+    srand((unsigned int) 49);
     instance = new Instance(argv[1]); //Parâmetro 1: nome do arquivo de instância para ser lido.
 
     instance->readFile();
