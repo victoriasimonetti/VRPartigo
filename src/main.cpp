@@ -26,7 +26,7 @@ Solution buscaTabu(Solution s){
 	Neighborhood* nb = new Neighborhood(instance);
 	int iter = 0;
 	int melhorIter = 0;
-	int BTmax = 100; //numero max de iterações sem melhora << ajustar parametro
+	int BTmax = 50; //numero max de iterações sem melhora << ajustar parametro
 	double aspiracao;
 	vector<int> listaTabu(T, 0);
 

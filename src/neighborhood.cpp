@@ -42,6 +42,8 @@ Solution Neighborhood::interRoutes(Solution s, int iter, vector<int>& listaTabu)
 	vector<int> caminhoRota2;
 	int aresta1, aresta2, aresta3, aresta4;
 	int i, auxAresta;
+	int iterSemMelhora = 0, iterSemMelhora2 = 0;
+	double ultimoCusto = 0, melhorCustoLocal = 0, melhorCustoGlobal = 0;
 
 	for(int rota1=0; rota1 < numRotas; rota1++){
 		caminhoRota1 = s.getRoute(rota1)->getCaminho();
@@ -49,60 +51,91 @@ Solution Neighborhood::interRoutes(Solution s, int iter, vector<int>& listaTabu)
 			caminhoRota2 = s.getRoute(rota2)->getCaminho();
 
 			for(aresta1=0; aresta1<caminhoRota1.size()-1; aresta1++){
-				for(aresta2=aresta1; aresta2<caminhoRota1.size()-1; aresta2++){
-				   if(aresta2 - aresta1 <= 7){ 
-					    for(aresta3=0; aresta3<caminhoRota2.size()-1; aresta3++){
-						    for(aresta4=aresta3; aresta4<caminhoRota2.size()-1; aresta4++){
+				iterSemMelhora2 = 0;
+				melhorCustoGlobal = auxSolution.getTotalCost();
 
-							    if(aresta4 - aresta3 <= 7){
-
-								    for(i=aresta1+1; i<=aresta2; i++){
-									    auxSolution = retiraNodo(auxSolution, caminhoRota1[i], rota1);
-								    }
-								    for(i=aresta3+1; i<=aresta4; i++){
-									    auxSolution = retiraNodo(auxSolution, caminhoRota2[i], rota2);
-								    }
-								    //add nodo na rota 2.
-								    auxAresta = caminhoRota2[aresta3];
-								    for(i=aresta1+1; i<=aresta2; i++){
-									    auxSolution = addNodo(auxSolution, auxAresta, rota2, caminhoRota1[i]);
-									    auxAresta = caminhoRota1[i];
-								    }
-								    //add nodo na rota 1.
-								    auxAresta = caminhoRota1[aresta1];
-								    for(i=aresta3+1; i<=aresta4; i++){
-									    auxSolution = addNodo(auxSolution, auxAresta, rota1, caminhoRota2[i]);
-									    auxAresta = caminhoRota2[i];
-								    }
-
-								    //recalcula
-								    auxSolution.recalculateSolutionOnlyRoute(rota1);
-								    auxSolution.recalculateSolutionOnlyRoute(rota2);
-					                			                
-								    //verifica se eh a melhor e n esta na lista tabu
-								    int t = ((long long)(auxSolution.getTotalCost()*1000)) % T;
-								    //int t = ((long long)(auxSolution.getTotalCost())) % T;
-								    if(listaTabu[t] - iter <= 0){
-								        if(auxSolution.getTotalCost() - bestSolution.getTotalCost() <= -0.000001){
-								            bestSolution = auxSolution;														   
-								        }
-								    }						        
-
-								    auxSolution = s;
+				for(aresta3=0; aresta3<caminhoRota2.size()-1; aresta3++){
+					melhorCustoLocal = 99999999;
+					
+					for(aresta2=aresta1; aresta2<caminhoRota1.size()-1; aresta2++){
+						iterSemMelhora = 0;
+						ultimoCusto = auxSolution.getTotalCost();
+					    
+						for(aresta4=aresta3; aresta4<caminhoRota2.size()-1; aresta4++){
+					
+						    if(aresta4 - aresta3 <= 7 && aresta2 - aresta1 <= 7){
+							    for(i=aresta1+1; i<=aresta2; i++){
+								    auxSolution = retiraNodo(auxSolution, caminhoRota1[i], rota1);
 							    }
+							    for(i=aresta3+1; i<=aresta4; i++){
+								    auxSolution = retiraNodo(auxSolution, caminhoRota2[i], rota2);
+							    }
+							    //add nodo na rota 2.
+							    auxAresta = caminhoRota2[aresta3];
+							    for(i=aresta1+1; i<=aresta2; i++){
+								    auxSolution = addNodo(auxSolution, auxAresta, rota2, caminhoRota1[i]);
+								    auxAresta = caminhoRota1[i];
+							    }
+							    //add nodo na rota 1.
+							    auxAresta = caminhoRota1[aresta1];
+							    for(i=aresta3+1; i<=aresta4; i++){
+								    auxSolution = addNodo(auxSolution, auxAresta, rota1, caminhoRota2[i]);
+								    auxAresta = caminhoRota2[i];
+							    }
+
+							    //recalcula
+							    auxSolution.recalculateSolutionOnlyRoute(rota1);
+							    auxSolution.recalculateSolutionOnlyRoute(rota2);
+				                			                
+							    //verifica se eh a melhor e n esta na lista tabu
+							    int t = ((long long)(auxSolution.getTotalCost()*1000)) % T;
+							    if(listaTabu[t] - iter <= 0){
+
+									//Add em iter sem melhora -> monitonicamente	        
+									if(auxSolution.getTotalCost() > ultimoCusto){
+										iterSemMelhora++;
+										ultimoCusto = auxSolution.getTotalCost();
+									}else{
+										iterSemMelhora = 0;
+									}
+
+									//guardar a melhor solução iter y1 e y2
+									if(auxSolution.getTotalCost() < melhorCustoLocal){
+										melhorCustoLocal = auxSolution.getTotalCost();
+									}
+
+									//atualiza para melhor solução
+							        if(auxSolution.getTotalCost() - bestSolution.getTotalCost() <= -0.000001){
+							            bestSolution = auxSolution;														   
+							        }
+							    }
+					
+							    auxSolution = s;
+
+								//se tiver 3 iterações sem melhora, cai fora.
+								if(iterSemMelhora == 3){
+									break;
+								}
 						    }
 					    }
+				    }
+					if(melhorCustoLocal > melhorCustoGlobal){
+						iterSemMelhora2++;
+						melhorCustoGlobal = melhorCustoLocal;
+					}else{
+						iterSemMelhora2 = 0;
+						melhorCustoGlobal = auxSolution.getTotalCost();
 					}
+
+					if(iterSemMelhora2 == 3){
+						break;
+					}	
 				}	
 			}	
 		}
 	}	
-	/*for(int i=0; i < numRotas; i++){ //para cada rota
-        bestSolution.getRoute(i)->printCaminho();
-    }*/
-
+	
     return bestSolution;
-    
 }
 
 
