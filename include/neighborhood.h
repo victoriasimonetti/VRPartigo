@@ -12,7 +12,7 @@ protected:
 	
 public:
 	Neighborhood(Instance* instance);
-	Solution interRoutes(Solution s);
+	Solution interRoutes(Solution s, int iter, vector<int>& listaTabu);
 	Solution retiraNodo(Solution s, int nodoSelected, int rota1);
 	Solution addNodo(Solution s, int arestaI, int rota2, int nodoSelected);
 };

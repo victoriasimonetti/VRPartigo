@@ -78,11 +78,11 @@ void Solution::calculateTimeServiceAndFaults(int i, int j, int v){
 void Solution::recalculateSolutionOnlyRoute(int v){
 
 
-	this->setTotalCost( this->getTotalCost() - (this->getRoute(v)->getTotalCostRoute() + 100*this->getRoute(v)->getLateCost() + 100*this->getRoute(v)->getOverCapacitated()));
+	this->setTotalCost( this->getTotalCost() - (this->getRoute(v)->getTotalCostRoute() + 100*this->getRoute(v)->getLateCost() + this->getRoute(v)->getOverCapacitated()));
 	this->delayedArrivalCost -= this->getRoute(v)->getLateCost();
 	this->overCapacitated -= this->getRoute(v)->getOverCapacitated();
 	this->calculaRotaSolution(v);	
-    this->setTotalCost(this->getTotalCost() + this->getRoute(v)->getTotalCostRoute() + 100*this->getRoute(v)->getLateCost() + 100*this->getRoute(v)->getOverCapacitated());
+    this->setTotalCost(this->getTotalCost() + this->getRoute(v)->getTotalCostRoute() + 100*this->getRoute(v)->getLateCost() + this->getRoute(v)->getOverCapacitated());
 	
 }
 
@@ -115,7 +115,7 @@ void Solution::forcaBrutaRecalculaSolution(){
 		this->setTotalCost(this->getTotalCost() + this->getRoute(v)->getTotalCostRoute());
     } 
     
-    this->setTotalCost(this->getTotalCost() + 100 * this->getDelayedArrivalCost() + 100 * this->getOverCapacitated());
+    this->setTotalCost(this->getTotalCost() + 100 * this->getDelayedArrivalCost() + this->getOverCapacitated());
 }
 
 void Solution::printSolution(){

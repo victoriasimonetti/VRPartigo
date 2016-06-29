@@ -1,4 +1,5 @@
 #include "../include/neighborhood.h"
+const int T = 100000;
 
 Neighborhood::Neighborhood(Instance* i){
     this->instancia = i;
@@ -30,7 +31,7 @@ Solution Neighborhood::addNodo(Solution s, int arestaI, int rota2, int nodoSelec
 	return s;
 }
 
-Solution Neighborhood::interRoutes(Solution s){
+Solution Neighborhood::interRoutes(Solution s, int iter, vector<int>& listaTabu){
 
 	Solution auxSolution(instancia);
 	Solution bestSolution(instancia);
@@ -41,7 +42,6 @@ Solution Neighborhood::interRoutes(Solution s){
 	vector<int> caminhoRota2;
 	int aresta1, aresta2, aresta3, aresta4;
 	int i, auxAresta;
-	
 
 	for(int rota1=0; rota1 < numRotas; rota1++){
 		caminhoRota1 = s.getRoute(rota1)->getCaminho();
@@ -50,49 +50,53 @@ Solution Neighborhood::interRoutes(Solution s){
 
 			for(aresta1=0; aresta1<caminhoRota1.size()-1; aresta1++){
 				for(aresta2=aresta1; aresta2<caminhoRota1.size()-1; aresta2++){
-					for(aresta3=0; aresta3<caminhoRota2.size()-1; aresta3++){
-						for(aresta4=aresta3; aresta4<caminhoRota2.size()-1; aresta4++){
+				   if(aresta2 - aresta1 <= 7){ 
+					    for(aresta3=0; aresta3<caminhoRota2.size()-1; aresta3++){
+						    for(aresta4=aresta3; aresta4<caminhoRota2.size()-1; aresta4++){
 
-							if(aresta2 - aresta1 <= 7 && aresta4 - aresta3 <= 7){
-								for(i=aresta1+1; i<=aresta2; i++){
-									auxSolution = retiraNodo(auxSolution, caminhoRota1[i], rota1);
-								}
-								for(i=aresta3+1; i<=aresta4; i++){
-									auxSolution = retiraNodo(auxSolution, caminhoRota2[i], rota2);
-								}
-								//add nodo na rota 2.
-								auxAresta = caminhoRota2[aresta3];
-								for(i=aresta1+1; i<=aresta2; i++){
-									auxSolution = addNodo(auxSolution, auxAresta, rota2, caminhoRota1[i]);
-									auxAresta = caminhoRota1[i];
-								}
-								//add nodo na rota 1.
-								auxAresta = caminhoRota1[aresta1];
-								for(i=aresta3+1; i<=aresta4; i++){
-									auxSolution = addNodo(auxSolution, auxAresta, rota1, caminhoRota2[i]);
-									auxAresta = caminhoRota2[i];
-								}
+							    if(aresta4 - aresta3 <= 7){
 
-								//recalcula
-								auxSolution.recalculateSolutionOnlyRoute(rota1);
-								auxSolution.recalculateSolutionOnlyRoute(rota2);
-							
-								//verifica se eh a melhor
-								if(auxSolution.getTotalCost() < bestSolution.getTotalCost()){
-									bestSolution = auxSolution;						
-									//cout << "custo: " << bestSolution.getTotalCost()<< " - a1: " << aresta1 << " a2: " << aresta2  << " a3: " << aresta3 << " a4: " << aresta4 << endl;
-								}
-							
-								//restaura
-								auxSolution = s;	
-							}					
-						}
+								    for(i=aresta1+1; i<=aresta2; i++){
+									    auxSolution = retiraNodo(auxSolution, caminhoRota1[i], rota1);
+								    }
+								    for(i=aresta3+1; i<=aresta4; i++){
+									    auxSolution = retiraNodo(auxSolution, caminhoRota2[i], rota2);
+								    }
+								    //add nodo na rota 2.
+								    auxAresta = caminhoRota2[aresta3];
+								    for(i=aresta1+1; i<=aresta2; i++){
+									    auxSolution = addNodo(auxSolution, auxAresta, rota2, caminhoRota1[i]);
+									    auxAresta = caminhoRota1[i];
+								    }
+								    //add nodo na rota 1.
+								    auxAresta = caminhoRota1[aresta1];
+								    for(i=aresta3+1; i<=aresta4; i++){
+									    auxSolution = addNodo(auxSolution, auxAresta, rota1, caminhoRota2[i]);
+									    auxAresta = caminhoRota2[i];
+								    }
+
+								    //recalcula
+								    auxSolution.recalculateSolutionOnlyRoute(rota1);
+								    auxSolution.recalculateSolutionOnlyRoute(rota2);
+					                			                
+								    //verifica se eh a melhor e n esta na lista tabu
+								    int t = ((long long)(auxSolution.getTotalCost()*1000)) % T;
+								    //int t = ((long long)(auxSolution.getTotalCost())) % T;
+								    if(listaTabu[t] - iter <= 0){
+								        if(auxSolution.getTotalCost() - bestSolution.getTotalCost() <= -0.000001){
+								            bestSolution = auxSolution;														   
+								        }
+								    }						        
+
+								    auxSolution = s;
+							    }
+						    }
+					    }
 					}
 				}	
 			}	
 		}
 	}	
-
 	/*for(int i=0; i < numRotas; i++){ //para cada rota
         bestSolution.getRoute(i)->printCaminho();
     }*/
